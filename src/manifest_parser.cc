@@ -98,6 +98,14 @@ bool ManifestParser::Parse(const string& filename, const string& input,
       if (!ParseFileInclude(true, err))
         return false;
       break;
+    case Lexer::SCOPE:
+      if (!ParseScope(err))
+        return false;
+      break;
+    case Lexer::ENDSCOPE:
+      if (!ParseEndScope(err))
+        return false;
+      break;
     case Lexer::ERROR: {
       return lexer_.Error(lexer_.DescribeLastError(), err);
     }
@@ -410,6 +418,20 @@ bool ManifestParser::ParseFileInclude(bool new_scope, string* err) {
   if (!subparser.Load(path, err, &lexer_))
     return false;
 
+  if (!ExpectToken(Lexer::NEWLINE, err))
+    return false;
+
+  return true;
+}
+
+bool ManifestParser::ParseScope(string* err) {
+  if (!ExpectToken(Lexer::NEWLINE, err))
+    return false;
+
+  return true;
+}
+
+bool ManifestParser::ParseEndScope(string* err) {
   if (!ExpectToken(Lexer::NEWLINE, err))
     return false;
 
