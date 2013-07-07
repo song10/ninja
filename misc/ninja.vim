@@ -32,6 +32,8 @@ syn match ninjaKeyword "^pool\>"
 syn match ninjaKeyword "^default\>"
 syn match ninjaKeyword "^include\>"
 syn match ninjaKeyword "^subninja\>"
+syn match ninjaKeyword "^scope\>"
+syn match ninjaKeyword "^endscope\>"
 
 " Both 'build' and 'rule' begin a variable scope that ends
 " on the first line without indent. 'rule' allows only a
