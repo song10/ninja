@@ -91,12 +91,14 @@ bool ManifestParser::Parse(const string& filename, const string& input,
       break;
     }
     case Lexer::INCLUDE:
-      if (!ParseFileInclude(false, err))
+      if (!ParseFileInclude(err))
         return false;
       break;
     case Lexer::SUBNINJA:
-      if (!ParseFileInclude(true, err))
+      StartScope();
+      if (!ParseFileInclude(err))
         return false;
+      EndScope();
       break;
     case Lexer::SCOPE:
       if (!ParseScope(err))
@@ -405,7 +407,7 @@ bool ManifestParser::ParseEdge(string* err) {
   return true;
 }
 
-bool ManifestParser::ParseFileInclude(bool new_scope, string* err) {
+bool ManifestParser::ParseFileInclude(string* err) {
   EvalString eval;
   if (!lexer_.ReadPath(&eval, err))
     return false;
@@ -431,10 +433,7 @@ bool ManifestParser::ParseScope(string* err) {
   if (!ExpectToken(Lexer::NEWLINE, err))
     return false;
 
-  scopes_.push(env_);
-  // XXX: who deletes this? (also in subninja path)
-  env_ = new BindingEnv(env_);
-
+  StartScope();
   return true;
 }
 
@@ -445,9 +444,7 @@ bool ManifestParser::ParseEndScope(string* err) {
   if (scopes_.empty())
     return lexer_.Error("no scope to close", err);
 
-  env_ = scopes_.top();
-  scopes_.pop();
-
+  EndScope();
   return true;
 }
 
@@ -460,4 +457,15 @@ bool ManifestParser::ExpectToken(Lexer::Token expected, string* err) {
     return lexer_.Error(message, err);
   }
   return true;
+}
+
+void ManifestParser::StartScope() {
+  scopes_.push(env_);
+  // XXX: Ownership?
+  env_ = new BindingEnv(env_);
+}
+
+void ManifestParser::EndScope() {
+  env_ = scopes_.top();
+  scopes_.pop();
 }
