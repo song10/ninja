@@ -60,7 +60,7 @@ private:
   bool ParseEndScope(string* err);
 
   /// Parse either a 'subninja' or 'include' line.
-  bool ParseFileInclude(string* err);
+  bool ParseFileInclude(bool new_scope, string* err);
 
   /// If the next token is not \a expected, produce an error string
   /// saying "expectd foo, got bar".

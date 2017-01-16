@@ -91,12 +91,12 @@ bool ManifestParser::Parse(const string& filename, const string& input,
       break;
     }
     case Lexer::INCLUDE:
-      if (!ParseFileInclude(err))
+      if (!ParseFileInclude(false, err))
         return false;
       break;
     case Lexer::SUBNINJA:
       StartScope();
-      if (!ParseFileInclude(err))
+      if (!ParseFileInclude(true, err))
         return false;
       EndScope();
       break;
@@ -406,7 +406,7 @@ bool ManifestParser::ParseEdge(string* err) {
   return true;
 }
 
-bool ManifestParser::ParseFileInclude(string* err) {
+bool ManifestParser::ParseFileInclude(bool new_scope, string* err) {
   EvalString eval;
   if (!lexer_.ReadPath(&eval, err))
     return false;
